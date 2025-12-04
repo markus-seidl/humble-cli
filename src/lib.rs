@@ -411,6 +411,11 @@ pub fn download_bundle(
         true => open_dir(".")?,
     };
 
+    // Store bundle.products as json in the destination directory
+    let bundle_json = serde_json::to_string(&bundle)?;
+    let bundle_json_path = bundle_dir.join("bundle.json");
+    fs::write(&bundle_json_path, bundle_json)?;
+
     let http_read_timeout = Duration::from_secs(30);
     let client = reqwest::Client::builder()
         .read_timeout(http_read_timeout)

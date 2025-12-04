@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use chrono::NaiveDateTime;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, VecSkipError};
 
 #[derive(Debug, PartialEq)]
@@ -28,7 +28,7 @@ impl ToString for ClaimStatus {
 pub type BundleMap = HashMap<String, Bundle>;
 
 #[serde_as]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Bundle {
     pub gamekey: String,
     pub created: NaiveDateTime,
@@ -90,7 +90,7 @@ impl Bundle {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BundleDetails {
     pub machine_name: String,
     pub human_name: String,
@@ -102,7 +102,7 @@ impl Bundle {
     }
 }
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Product {
     pub machine_name: String,
     pub human_name: String,
@@ -157,7 +157,7 @@ impl Product {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProductDownload {
     #[serde(rename = "download_struct")]
     pub items: Vec<DownloadInfo>,
@@ -177,7 +177,7 @@ impl ProductDownload {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DownloadInfo {
     pub md5: String,
 
@@ -189,7 +189,7 @@ pub struct DownloadInfo {
     pub url: DownloadUrl,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DownloadUrl {
     pub web: String,
     pub bittorrent: String,
