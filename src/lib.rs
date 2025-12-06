@@ -367,6 +367,10 @@ pub fn download_bundle(
 ) -> Result<(), anyhow::Error> {
     let config = get_config()?;
 
+    println!("=============================================================================");
+    println!("Downloading bundle: {}", bundle_key);
+    println!("=============================================================================");
+
     let api = crate::HumbleApi::new(&config.session_key);
 
     let bundle_key = match find_key(handle_http_errors(api.list_bundle_keys())?, bundle_key) {
@@ -421,19 +425,26 @@ pub fn download_bundle(
         .read_timeout(http_read_timeout)
         .build()?;
 
+    // if done file exists, skip
+    let done_path = bundle_dir.join("done");
+    if done_path.exists() {
+        println!("Done file exists. Skipping.");
+        return Ok(());
+    }
+
     for product in products {
         if max_size > 0 && product.total_size() > max_size {
             continue;
         }
-
-        println!();
-        println!("{}", product.human_name);
 
         let dir_name = util::replace_invalid_chars_in_filename(&product.human_name);
         let entry_dir = bundle_dir.join(dir_name);
         if !entry_dir.exists() {
             fs::create_dir(&entry_dir)?;
         }
+
+        println!();
+        println!("{} into {}", product.human_name, entry_dir.canonicalize()?.display());
 
         for product_download in product.downloads.iter() {
             for dl_info in product_download.items.iter() {
@@ -462,6 +473,10 @@ pub fn download_bundle(
             }
         }
     }
+
+    // create a done file in bundle_dir
+    let done_path = bundle_dir.join("done");
+    fs::write(&done_path, "")?;
 
     Ok(())
 }
